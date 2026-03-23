@@ -274,19 +274,22 @@ export default function GalleryPage() {
     setSearchParams(params);
   };
 
-  const [sortBy, setSortBy] = useState<"recent" | "color">("recent");
+  const [sortBy, setSortBy] = useState<"color" | "recent">("color");
 
   type GalleryItem =
     | { kind: "gradient"; item: (typeof gradientItems)[number] }
     | { kind: "palette"; item: (typeof paletteItems)[number] };
 
-  const getDominantHue = (entry: GalleryItem): number => {
+  // Extract all hex colors from an item
+  const getColors = (entry: GalleryItem): string[] => {
     if (entry.kind === "gradient") {
       try {
         const state: GradientState = JSON.parse(entry.item.state);
-        const hex = state.colors?.[0]?.color ?? "#000000";
-        return hexToOklch(hex).h;
-      } catch { return 0; }
+        const colors = state.colors?.map((c) => c.color) ?? [];
+        const aura = state.auraPoints?.map((p) => p.color) ?? [];
+        const mesh = state.meshPoints?.map((p) => p.color) ?? [];
+        return [...colors, ...aura, ...mesh].filter(Boolean);
+      } catch { return []; }
     } else {
       const parsed: PaletteColor[] = (() => {
         try {
@@ -294,9 +297,17 @@ export default function GalleryPage() {
           return Array.isArray(p) && p.length > 0 && "base" in p[0] ? p : [];
         } catch { return []; }
       })();
-      const hex = parsed[0]?.base ?? "#000000";
-      return hexToOklch(hex).h;
+      return parsed.map((c) => c.base);
     }
+  };
+
+  // Sort key: hue of the most chromatic (vivid) color in the item
+  const getColorSortKey = (entry: GalleryItem): number => {
+    const hexes = getColors(entry);
+    if (hexes.length === 0) return 0;
+    const oklchs = hexes.map(hexToOklch);
+    const mostVivid = oklchs.reduce((best, c) => (c.C > best.C ? c : best), oklchs[0]);
+    return mostVivid.h;
   };
 
   const allItems: GalleryItem[] = [
@@ -304,7 +315,7 @@ export default function GalleryPage() {
     ...paletteItems.map((p) => ({ kind: "palette" as const, item: p })),
   ].sort((a, b) =>
     sortBy === "color"
-      ? getDominantHue(a) - getDominantHue(b)
+      ? getColorSortKey(a) - getColorSortKey(b)
       : new Date(b.item.createdAt).getTime() - new Date(a.item.createdAt).getTime()
   );
 
@@ -350,14 +361,24 @@ export default function GalleryPage() {
               <span className="w-px h-5 bg-border hidden sm:block" />
 
               <button
-                onClick={() => setSortBy(sortBy === "recent" ? "color" : "recent")}
+                onClick={() => setSortBy("color")}
                 className={`px-3 py-2 rounded-lg text-sm sm:text-xs font-medium transition-all ${
                   sortBy === "color"
                     ? "bg-surface-3 text-text"
                     : "text-text-dim hover:text-text"
                 }`}
               >
-                {sortBy === "color" ? "Sorted by Color" : "Sort by Color"}
+                By Color
+              </button>
+              <button
+                onClick={() => setSortBy("recent")}
+                className={`px-3 py-2 rounded-lg text-sm sm:text-xs font-medium transition-all ${
+                  sortBy === "recent"
+                    ? "bg-surface-3 text-text"
+                    : "text-text-dim hover:text-text"
+                }`}
+              >
+                Recent
               </button>
             </div>
 
