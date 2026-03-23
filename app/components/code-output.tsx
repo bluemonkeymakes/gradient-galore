@@ -9,7 +9,7 @@ export function CodeOutput() {
   const code = generateFullCSS(state);
 
   const handleCopy = async () => {
-    await navigator.clipboard.writeText(code);
+    try { await navigator.clipboard.writeText(code); } catch { return; }
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };

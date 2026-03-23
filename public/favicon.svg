@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <defs>
+    <radialGradient id="a" cx="20%" cy="30%" r="70%">
+      <stop offset="0%" stop-color="#e8956a"/>
+      <stop offset="100%" stop-color="#e8956a" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="b" cx="75%" cy="15%" r="55%">
+      <stop offset="0%" stop-color="#3bbfbf"/>
+      <stop offset="100%" stop-color="#3bbfbf" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="c" cx="45%" cy="75%" r="45%">
+      <stop offset="0%" stop-color="#ef4423"/>
+      <stop offset="60%" stop-color="#ef4423" stop-opacity="0.4"/>
+      <stop offset="100%" stop-color="#ef4423" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="d" cx="85%" cy="90%" r="50%">
+      <stop offset="0%" stop-color="#f0a030"/>
+      <stop offset="100%" stop-color="#f0a030" stop-opacity="0"/>
+    </radialGradient>
+    <clipPath id="clip">
+      <rect width="32" height="32" rx="7"/>
+    </clipPath>
+  </defs>
+  <g clip-path="url(#clip)">
+    <rect width="32" height="32" fill="#e09050"/>
+    <rect width="32" height="32" fill="url(#a)"/>
+    <rect width="32" height="32" fill="url(#b)"/>
+    <rect width="32" height="32" fill="url(#c)"/>
+    <rect width="32" height="32" fill="url(#d)"/>
+  </g>
+</svg>

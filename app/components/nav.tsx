@@ -1,8 +1,10 @@
 import { NavLink } from "react-router";
 
 const links = [
+  { to: "/gallery", label: "Gallery" },
   { to: "/", label: "Gradients" },
   { to: "/palettes", label: "Palettes" },
+  { to: "/about", label: "About" },
 ];
 
 export function Nav() {
@@ -21,7 +23,7 @@ export function Nav() {
                 className={({ isActive }) =>
                   `px-4 py-1.5 rounded-lg text-sm font-medium transition-all ${
                     isActive
-                      ? "bg-accent text-white"
+                      ? "bg-accent text-black"
                       : "text-text-dim hover:text-text"
                   }`
                 }

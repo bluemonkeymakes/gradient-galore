@@ -1,52 +1,70 @@
 import { useId } from "react";
 import { useAtomValue } from "jotai";
 import { gradientAtom } from "~/lib/atoms";
+import type { GradientState } from "~/lib/gradient-engine";
 
+/** Pure marble renderer — no jotai dependency */
+export function MarbleSvg({ state, className = "" }: { state: GradientState; className?: string }) {
+  return <MarbleInner state={state} className={className} />;
+}
+
+/** Live marble canvas that reads from the jotai atom */
 export function MarbleCanvas() {
   const state = useAtomValue(gradientAtom);
-  const filterId = useId();
-  const maskId = useId();
+  return <MarbleInner state={state} className="rounded-2xl" />;
+}
 
+function MarbleInner({ state, className = "" }: { state: GradientState; className?: string }) {
+  const uid = useId();
   const colors = state.colors;
   const bgColor = colors[0]?.color ?? "#8b5cf6";
   const color1 = colors[1]?.color ?? "#ec4899";
   const color2 = colors[2]?.color ?? colors[0]?.color ?? "#f97316";
 
-  const blur = 4 + (state.marbleTurbulence / 10) * 16;
-  const scale1 = 0.8 + (state.marbleScale / 20) * 0.8;
-  const scale2 = 0.9 + (state.marbleScale / 20) * 0.7;
-  const baseRotate = state.marbleRotate;
-  const rotate1 = (baseRotate + state.marbleSeed * 3.6) % 360;
-  const rotate2 = (baseRotate + (state.marbleSeed * 7.3) % 360) % 360;
-  const tx1 = ((state.marbleSeed * 1.7) % 20) - 10;
-  const ty1 = ((state.marbleSeed * 2.3) % 20) - 10;
-  const tx2 = ((state.marbleSeed * 3.1) % 20) - 10;
-  const ty2 = ((state.marbleSeed * 4.7) % 20) - 10;
-  const blendMode = state.marbleBlendMode;
+  // Blur: 0.5 → 15 (wider range, starts low so shapes are visible)
+  const blur = 0.5 + ((state.marbleTurbulence ?? 3) / 10) * 14.5;
+  // Scale: 0.4 → 2.2 (much wider range)
+  const scale1 = 0.4 + ((state.marbleScale ?? 4) / 20) * 1.8;
+  const scale2 = 0.5 + ((state.marbleScale ?? 4) / 20) * 1.5;
+  const seed = state.marbleSeed ?? 1;
+  const baseRotate = state.marbleRotate ?? 0;
+  const rotate1 = (baseRotate + seed * 3.6) % 360;
+  const rotate2 = (baseRotate + seed * 7.3) % 360;
+  // Translation: -25 to +25 (wider movement)
+  const tx1 = ((seed * 1.7) % 50) - 25;
+  const ty1 = ((seed * 2.3) % 50) - 25;
+  const tx2 = ((seed * 3.1) % 50) - 25;
+  const ty2 = ((seed * 4.7) % 50) - 25;
+  const blendMode = state.marbleBlendMode ?? "overlay";
+
+  const filterId = `marble-blur-${uid}`;
+  const clipId = `marble-clip-${uid}`;
 
   return (
     <svg
       viewBox="0 0 100 100"
       xmlns="http://www.w3.org/2000/svg"
-      className="absolute inset-0 w-full h-full rounded-2xl"
+      className={`absolute inset-0 w-full h-full ${className}`}
       preserveAspectRatio="xMidYMid slice"
     >
       <defs>
         <filter
           id={filterId}
+          x="-50"
+          y="-50"
+          width="200"
+          height="200"
           filterUnits="userSpaceOnUse"
           colorInterpolationFilters="sRGB"
         >
-          <feFlood floodOpacity={0} result="BackgroundImageFix" />
-          <feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape" />
-          <feGaussianBlur stdDeviation={blur} result="blur" />
+          <feGaussianBlur in="SourceGraphic" stdDeviation={blur} />
         </filter>
-        <clipPath id={maskId}>
+        <clipPath id={clipId}>
           <rect width={100} height={100} />
         </clipPath>
       </defs>
 
-      <g clipPath={`url(#${maskId})`}>
+      <g clipPath={`url(#${clipId})`}>
         <rect width={100} height={100} fill={bgColor} />
 
         <path
@@ -65,10 +83,10 @@ export function MarbleCanvas() {
         />
 
         {colors.slice(3).map((c, i) => {
-          const r = (baseRotate + (state.marbleSeed * (i + 5.3)) % 360) % 360;
-          const tx = ((state.marbleSeed * (i + 2.1)) % 24) - 12;
-          const ty = ((state.marbleSeed * (i + 3.7)) % 24) - 12;
-          const s = 0.7 + (state.marbleScale / 20) * 0.9;
+          const r = (baseRotate + seed * (i + 5.3)) % 360;
+          const tx = ((seed * (i + 2.1)) % 50) - 25;
+          const ty = ((seed * (i + 3.7)) % 50) - 25;
+          const s = 0.4 + ((state.marbleScale ?? 4) / 20) * 1.6;
           const blend = i % 2 === 0 ? blendMode : "soft-light";
           return (
             <path

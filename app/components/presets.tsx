@@ -1,5 +1,5 @@
-import { useSetAtom } from "jotai";
-import { gradientAtom } from "~/lib/atoms";
+import { useSetAtom, useAtomValue } from "jotai";
+import { gradientAtom, pushGradientHistoryAtom } from "~/lib/atoms";
 import { createId, type GradientState } from "~/lib/gradient-engine";
 
 export interface Preset {
@@ -59,9 +59,9 @@ export const PRESETS: Preset[] = [
       type: "aura",
       auraBgColor: "#0c0a1e",
       auraPoints: [
-        { id: createId(), color: "#a855f7", x: 30, y: 35, size: 70, opacity: 70 },
-        { id: createId(), color: "#3b82f6", x: 65, y: 40, size: 65, opacity: 60 },
-        { id: createId(), color: "#06b6d4", x: 45, y: 70, size: 75, opacity: 55 },
+        { id: createId(), color: "#a855f7", x: 30, y: 35, size: 70, opacity: 70, stretch: 60, rotate: 15 },
+        { id: createId(), color: "#3b82f6", x: 65, y: 40, size: 65, opacity: 60, stretch: 40, rotate: 45 },
+        { id: createId(), color: "#06b6d4", x: 45, y: 70, size: 75, opacity: 55, stretch: 55, rotate: 120 },
       ],
     },
   },
@@ -87,10 +87,10 @@ export const PRESETS: Preset[] = [
       type: "mesh",
       meshBgColor: "#0a0a2e",
       meshPoints: [
-        { id: createId(), color: "#22d3ee", x: 15, y: 25, spread: 45, opacity: 100 },
-        { id: createId(), color: "#a78bfa", x: 75, y: 15, spread: 50, opacity: 90 },
-        { id: createId(), color: "#34d399", x: 30, y: 75, spread: 40, opacity: 100 },
-        { id: createId(), color: "#f472b6", x: 85, y: 70, spread: 35, opacity: 80 },
+        { id: createId(), color: "#22d3ee", x: 15, y: 25, spread: 45, opacity: 100, stretch: 65, rotate: 20 },
+        { id: createId(), color: "#a78bfa", x: 75, y: 15, spread: 50, opacity: 90, stretch: 40, rotate: 60 },
+        { id: createId(), color: "#34d399", x: 30, y: 75, spread: 40, opacity: 100, stretch: 50, rotate: 0 },
+        { id: createId(), color: "#f472b6", x: 85, y: 70, spread: 35, opacity: 80, stretch: 70, rotate: 135 },
       ],
     },
   },
@@ -98,9 +98,13 @@ export const PRESETS: Preset[] = [
 
 export function PresetBar() {
   const setGradient = useSetAtom(gradientAtom);
+  const pushHistory = useSetAtom(pushGradientHistoryAtom);
 
   const applyPreset = (preset: Partial<GradientState>) => {
-    setGradient((prev) => ({ ...prev, ...preset }));
+    setGradient((prev) => {
+      pushHistory(prev);
+      return { ...prev, ...preset };
+    });
   };
 
   return (
