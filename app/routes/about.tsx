@@ -12,37 +12,37 @@ const COLOR_TOOLS = [
     name: "Josh W Comeau's Gradient Generator",
     url: "https://www.joshwcomeau.com/gradient-generator/",
     description:
-      "Beautiful easing-based gradients that avoid the muddy middle. A must-bookmark for anyone who cares about perceptual color transitions.",
+      "Easing-based gradients that avoid the muddy middle. Really well thought out.",
   },
   {
     name: "Dopely Colors",
     url: "https://colors.dopely.top/",
     description:
-      "A full suite of color tools — palette generator, gradients, contrast checker, and more. Great for exploring color relationships.",
+      "Full suite of colour tools — palette generator, gradients, contrast checker. Handy for exploring colour relationships.",
   },
   {
     name: "Grabient",
     url: "https://grabient.com/",
     description:
-      "Clean, flexible gradient picker with a gorgeous UI. Perfect for quickly snagging a linear gradient for your next project.",
+      "Clean gradient picker. Good for quickly grabbing a linear gradient without overthinking it.",
   },
   {
     name: "Color Chef",
     url: "https://colorchef.vercel.app/",
     description:
-      "A smart palette generator that cooks up harmonious color schemes. Great for quickly finding balanced palettes from a single seed color.",
+      "Palette generator that finds harmonious schemes from a single seed colour. Simple and effective.",
   },
   {
     name: "Huemint",
     url: "https://huemint.com/brand-intersection/",
     description:
-      "AI-powered color palette generator that previews your colors on real brand mockups. Perfect for seeing how a palette actually feels in context.",
+      "AI palette generator that shows your colours on real brand mockups. Useful for getting a feel before committing.",
   },
   {
     name: "Nippon Colors",
     url: "https://nipponcolors.com/",
     description:
-      "A gorgeous collection of traditional Japanese colors. Incredible inspiration for muted, earthy, and refined palettes.",
+      "Traditional Japanese colour collection. Great for finding muted, earthy tones you wouldn't stumble on otherwise.",
   },
 ];
 
@@ -51,7 +51,7 @@ const OTHER_TOOLS = [
     name: "Boring Avatars",
     url: "https://boringavatars.com/",
     description:
-      "Tiny React library that generates beautiful SVG avatars from any username. We use it everywhere.",
+      "Generates nice SVG avatars from any username. Small library, we use it a lot.",
   },
 ];
 
@@ -62,70 +62,57 @@ export default function AboutPage() {
 
       <main className="flex-1 px-6 py-12">
         <div className="max-w-3xl mx-auto space-y-16">
-          {/* Hero */}
+          {/* Story */}
           <section className="space-y-6">
             <h2 className="text-3xl font-bold tracking-tight">
-              Why we built{" "}
-              <span className="text-accent">Gradient Galore</span>
+              About <span className="text-accent">Gradient Galore</span>
             </h2>
             <div className="space-y-4 text-sm leading-relaxed text-text-dim">
               <p>
-                We were deep into a client project — finessing an aura gradient for a hero
-                section — and realised there wasn't a single tool that let us play with
-                aura, mesh, and marble gradients alongside our colour palettes. Every
-                generator we tried either stopped at linear/radial or didn't let us tweak
-                individual layers the way we needed.
+                We were working on a project and needed a way to experiment with
+                aura, mesh, and marble gradients alongside our colour palettes.
+                Couldn't find a tool that handled layered gradients the way we
+                wanted, so we made one.
               </p>
               <p>
-                So we built one.
-              </p>
-              <p>
-                Gradient Galore started as an internal tool at our agency and quickly became
-                something we wanted to share. It's designed for the way we actually work:
-                pick a palette, experiment with layered gradients, fine-tune with OKLCH
-                sliders, and export production-ready CSS — all without leaving the browser.
-              </p>
-              <p>
-                If it saves you even a few minutes of fiddling with background properties in
-                DevTools, we'll call that a win.
+                It started as an internal thing at our studio. We ended up using
+                it enough that it seemed worth putting out there. Pick colours,
+                layer gradients, tweak things with OKLCH sliders, copy the CSS
+                when you're happy. That's about it.
               </p>
             </div>
           </section>
 
-          {/* Agency callout */}
+          {/* Agency */}
           <section className="bg-surface-2 border border-border rounded-2xl p-8 space-y-4">
-            <div className="space-y-2">
-              <p className="text-xs font-semibold uppercase tracking-wider text-text-dim">
-                Made by
-              </p>
-              <h3 className="text-xl font-bold">
-                Blue Monkey Makes
-              </h3>
+            <div className="space-y-1">
+              <p className="text-xs text-text-dim">Made by</p>
+              <h3 className="text-lg font-semibold">Blue Monkey Makes</h3>
             </div>
             <p className="text-sm leading-relaxed text-text-dim">
-              We're a small design and engineering agency that builds tools, products, and
-              experiences for teams who care about craft. Gradient Galore is one of the
-              side projects we've released into the wild — if you dig it, come say hello.
+              We're a small design and engineering studio. We build tools,
+              products, and the occasional thing like this that we think
+              someone else might find useful.
             </p>
             <a
               href="https://bluemonkeymakes.com"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-accent text-black text-sm font-medium hover:bg-accent-hover transition-all"
+              className="inline-flex items-center gap-2 text-sm text-text-dim hover:text-accent transition-all"
             >
-              Visit bluemonkeymakes.com
-              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+              bluemonkeymakes.com
+              <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M7 17L17 7M17 7H7M17 7v10" />
               </svg>
             </a>
           </section>
 
-          {/* Color tools */}
+          {/* Colour tools */}
           <section className="space-y-6">
             <div className="space-y-1">
-              <h3 className="text-lg font-semibold">Awesome Color Tools</h3>
+              <h3 className="text-lg font-semibold">Colour Tools We Like</h3>
               <p className="text-xs text-text-dim">
-                Other tools we reach for regularly. These are all worth bookmarking.
+                Other tools we use. Worth having in your bookmarks.
               </p>
             </div>
             <div className="grid gap-4">
@@ -153,12 +140,12 @@ export default function AboutPage() {
             </div>
           </section>
 
-          {/* Other tools we love */}
+          {/* Other tools */}
           <section className="space-y-6">
             <div className="space-y-1">
-              <h3 className="text-lg font-semibold">Other Tools We Love</h3>
+              <h3 className="text-lg font-semibold">Other Tools We Use</h3>
               <p className="text-xs text-text-dim">
-                Not gradient-related, but too good not to mention.
+                Not colour-related, just good.
               </p>
             </div>
             <div className="grid gap-4">
@@ -186,10 +173,10 @@ export default function AboutPage() {
             </div>
           </section>
 
-          {/* Footer note */}
+          {/* Footer */}
           <section className="border-t border-border pt-8 pb-4 text-center">
             <p className="text-xs text-text-dim">
-              Built with React Router, Tailwind, OKLCH color math, and too many late nights.
+              React Router, Tailwind, OKLCH colour math, and a bit of stubbornness.
             </p>
           </section>
         </div>
