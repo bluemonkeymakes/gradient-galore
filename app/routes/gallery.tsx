@@ -301,23 +301,36 @@ export default function GalleryPage() {
     }
   };
 
-  // Sort key: hue of the most chromatic (vivid) color in the item
-  const getColorSortKey = (entry: GalleryItem): number => {
+  // Color fingerprint: chroma-weighted average hue of all colors.
+  // Items sharing the same palette colors get the same fingerprint
+  // and naturally cluster together.
+  const getColorFingerprint = (entry: GalleryItem): number => {
     const hexes = getColors(entry);
     if (hexes.length === 0) return 0;
     const oklchs = hexes.map(hexToOklch);
-    const mostVivid = oklchs.reduce((best, c) => (c.C > best.C ? c : best), oklchs[0]);
-    return mostVivid.h;
+    const totalChroma = oklchs.reduce((s, c) => s + c.C, 0);
+    if (totalChroma === 0) return 0;
+    // Use circular mean to handle hue wrapping (e.g., 350° and 10° are close)
+    const sinSum = oklchs.reduce((s, c) => s + c.C * Math.sin((c.h * Math.PI) / 180), 0);
+    const cosSum = oklchs.reduce((s, c) => s + c.C * Math.cos((c.h * Math.PI) / 180), 0);
+    const avgHue = ((Math.atan2(sinSum, cosSum) * 180) / Math.PI + 360) % 360;
+    return avgHue;
   };
 
   const allItems: GalleryItem[] = [
     ...gradientItems.map((g) => ({ kind: "gradient" as const, item: g })),
     ...paletteItems.map((p) => ({ kind: "palette" as const, item: p })),
-  ].sort((a, b) =>
-    sortBy === "color"
-      ? getColorSortKey(a) - getColorSortKey(b)
-      : new Date(b.item.createdAt).getTime() - new Date(a.item.createdAt).getTime()
-  );
+  ].sort((a, b) => {
+    if (sortBy === "color") {
+      const diff = getColorFingerprint(a) - getColorFingerprint(b);
+      // Within same hue band (~15° tolerance), sort by date
+      if (Math.abs(diff) < 15) {
+        return new Date(b.item.createdAt).getTime() - new Date(a.item.createdAt).getTime();
+      }
+      return diff;
+    }
+    return new Date(b.item.createdAt).getTime() - new Date(a.item.createdAt).getTime();
+  });
 
   return (
     <div className="min-h-screen flex flex-col">
