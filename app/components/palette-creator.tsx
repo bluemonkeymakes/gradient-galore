@@ -182,7 +182,7 @@ export function PaletteCreator({ onClose }: { onClose: () => void }) {
 
                 {isExpanded && pc && (
                   <div className="px-3 py-3 border-t border-border">
-                    <div className="grid grid-cols-11 gap-1">
+                    <div className="grid grid-cols-6 sm:grid-cols-11 gap-1">
                       {pc.shades.map((s) => (
                         <div key={s.shade} className="flex flex-col items-center gap-1">
                           <div className="w-full aspect-square rounded-lg" style={{ backgroundColor: s.color }} />

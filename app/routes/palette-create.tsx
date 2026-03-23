@@ -256,9 +256,9 @@ export default function PaletteCreatePage() {
   };
 
   return (
-    <div className="h-screen flex flex-col overflow-hidden">
+    <div className="min-h-screen lg:h-screen flex flex-col lg:overflow-hidden">
       {/* Top bar */}
-      <header className="shrink-0 flex items-center gap-3 px-4 py-3 bg-surface-2 border-b border-border z-30">
+      <header className="shrink-0 flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-3 bg-surface-2 border-b border-border z-30 flex-wrap sm:flex-nowrap">
         <button
           onClick={() => setDrawerOpen(!drawerOpen)}
           className="p-2 rounded-lg text-text-dim hover:text-text hover:bg-surface-3 transition-all"
@@ -309,7 +309,7 @@ export default function PaletteCreatePage() {
       </header>
 
       {/* Main area */}
-      <div className="flex-1 flex relative overflow-hidden">
+      <div className="flex-1 flex relative overflow-hidden lg:overflow-hidden overflow-y-auto">
         {/* Drawer backdrop */}
         {drawerOpen && (
           <div
@@ -320,7 +320,7 @@ export default function PaletteCreatePage() {
 
         {/* Drawer panel */}
         <aside
-          className={`absolute top-0 left-0 bottom-0 w-80 bg-surface-2 border-r border-border z-30 overflow-y-auto controls-scroll transition-transform duration-300 ${
+          className={`absolute top-0 left-0 bottom-0 w-full sm:w-80 bg-surface-2 border-r border-border z-30 overflow-y-auto controls-scroll transition-transform duration-300 ${
             drawerOpen ? "translate-x-0" : "-translate-x-full"
           }`}
         >
@@ -381,8 +381,8 @@ export default function PaletteCreatePage() {
           </div>
         </aside>
 
-        {/* Color columns — each with its own shade scale at bottom */}
-        <div className="flex-1 flex min-w-0 overflow-hidden">
+        {/* Color columns — stacked on mobile, side-by-side on desktop */}
+        <div className="flex-1 flex flex-col lg:flex-row min-w-0 overflow-hidden">
           {entries.map((entry, idx) => {
             const pc = paletteColors.find((c) => c.name === entry.name);
             const fg = textColorForBg(entry.hex);
@@ -394,7 +394,7 @@ export default function PaletteCreatePage() {
             return (
               <div
                 key={entry.id}
-                className="flex-1 flex flex-col min-w-0 overflow-hidden"
+                className="flex-1 flex flex-col min-w-0 overflow-hidden min-h-48 lg:min-h-0"
               >
                 {/* Main color area */}
                 <div
@@ -402,7 +402,7 @@ export default function PaletteCreatePage() {
                   style={{ backgroundColor: entry.hex }}
                 >
                   {/* Column controls */}
-                  <div className="shrink-0 flex flex-col items-center gap-1.5 pt-3 pb-2 px-1 overflow-hidden w-full">
+                  <div className="shrink-0 flex flex-row lg:flex-col items-center gap-2 lg:gap-1.5 p-3 lg:pt-3 lg:pb-2 lg:px-1 overflow-hidden w-full">
                     <input
                       type="color"
                       value={entry.hex}
@@ -414,7 +414,7 @@ export default function PaletteCreatePage() {
                       type="text"
                       value={entry.name}
                       onChange={(e) => updateEntry(entry.id, { name: e.target.value })}
-                      className="bg-transparent text-center text-xs font-semibold w-full min-w-0 focus:outline-none border-b border-transparent focus:border-current truncate"
+                      className="bg-transparent text-left lg:text-center text-xs font-semibold w-20 lg:w-full min-w-0 focus:outline-none border-b border-transparent focus:border-current truncate"
                       style={{ color: fg }}
                     />
                     <span
@@ -511,7 +511,7 @@ export default function PaletteCreatePage() {
                 </div>
 
                 {/* Tints, Shades, Tones scales */}
-                <div className="shrink-0 overflow-hidden">
+                <div className="shrink-0 overflow-hidden w-full">
                   <ScaleRow
                     label="Tint"
                     swatches={generateTints(entry.hex)}

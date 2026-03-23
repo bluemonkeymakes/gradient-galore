@@ -186,7 +186,7 @@ function ColorScaleRow({
 
       {/* Expanded shade grid */}
       {expanded && (
-        <div className="grid grid-cols-11 gap-1.5 pt-1">
+        <div className="grid grid-cols-6 sm:grid-cols-11 gap-1.5 pt-1">
           {pc.shades.map((s) => (
             <button
               key={s.shade}
@@ -317,7 +317,7 @@ export default function PalettesPage() {
     <div className="min-h-screen flex flex-col">
       <Nav />
 
-      <main className="flex-1 px-6 py-6">
+      <main className="flex-1 px-4 sm:px-6 py-4 sm:py-6">
         <div className="max-w-5xl mx-auto space-y-6">
           {/* Toolbar */}
           <div className="flex items-center justify-between">

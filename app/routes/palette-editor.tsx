@@ -364,7 +364,7 @@ export default function PaletteEditorPage() {
 
                     {/* Expanded grid */}
                     {expanded === pc.name && (
-                      <div className="grid grid-cols-11 gap-1.5 p-3 border-t border-border">
+                      <div className="grid grid-cols-6 sm:grid-cols-11 gap-1.5 p-3 border-t border-border">
                         {pc.shades.map((s) => (
                           <button
                             key={s.shade}

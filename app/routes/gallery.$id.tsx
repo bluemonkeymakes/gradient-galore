@@ -58,14 +58,15 @@ export default function GradientDetail() {
   return (
     <div className="min-h-screen flex flex-col bg-surface">
       {/* Top bar */}
-      <div className="flex items-center justify-between px-6 py-4 border-b border-border">
+      <div className="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 border-b border-border flex-wrap gap-2">
         <Link to="/gallery" className="text-sm text-text-dim hover:text-text transition-all flex items-center gap-2">
           <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
           </svg>
-          Back to Gallery
+          <span className="hidden sm:inline">Back to Gallery</span>
+          <span className="sm:hidden">Back</span>
         </Link>
-        <div className="flex gap-2">
+        <div className="flex gap-2 flex-wrap">
           <button
             onClick={() => {
               navigator.clipboard.writeText(window.location.href);
@@ -139,8 +140,8 @@ export default function GradientDetail() {
       )}
 
       {/* Info bar */}
-      <div className="px-6 py-5 border-t border-border bg-surface-2">
-        <div className="max-w-4xl mx-auto flex items-start justify-between gap-6">
+      <div className="px-4 sm:px-6 py-4 sm:py-5 border-t border-border bg-surface-2">
+        <div className="max-w-4xl mx-auto flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 sm:gap-6">
           <div className="space-y-2">
             <h1 className="text-xl font-semibold">{gradient.name}</h1>
             <div className="flex items-center gap-3 text-xs text-text-dim">

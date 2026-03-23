@@ -60,7 +60,7 @@ export default function AboutPage() {
     <div className="min-h-screen flex flex-col">
       <Nav />
 
-      <main className="flex-1 px-6 py-12">
+      <main className="flex-1 px-4 sm:px-6 py-8 sm:py-12">
         <div className="max-w-3xl mx-auto space-y-16">
           {/* Story */}
           <section className="space-y-6">

@@ -290,8 +290,8 @@ export default function GalleryPage() {
     <div className="min-h-screen flex flex-col">
       <Nav />
 
-      <main className="flex-1 px-6 py-6">
-        <div className="max-w-6xl mx-auto space-y-6">
+      <main className="flex-1 px-4 sm:px-6 py-4 sm:py-6">
+        <div className="max-w-6xl mx-auto space-y-4 sm:space-y-6">
           {/* Header */}
           <div className="flex items-center justify-between">
             <div>
@@ -315,7 +315,7 @@ export default function GalleryPage() {
                 <button
                   key={c.value}
                   onClick={() => setFilter("category", c.value)}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                  className={`px-3 py-2 rounded-lg text-sm sm:text-xs font-medium transition-all ${
                     category === c.value
                       ? "bg-accent text-black"
                       : "bg-surface-2 border border-border text-text-dim hover:text-text"
@@ -333,7 +333,7 @@ export default function GalleryPage() {
                   <button
                     key={t.value}
                     onClick={() => setFilter("type", t.value)}
-                    className={`px-2.5 py-1 rounded-md text-xs transition-all ${
+                    className={`px-3 py-1.5 rounded-md text-sm sm:text-xs transition-all ${
                       type === t.value
                         ? "bg-surface-3 text-text font-medium"
                         : "text-text-dim hover:text-text"
