@@ -79,6 +79,7 @@ body {
   background: var(--color-surface);
   color: var(--color-text);
   min-height: 100vh;
+  overflow-x: hidden;
 }
 
 /* Checkerboard for transparency */
