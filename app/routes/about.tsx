@@ -67,7 +67,7 @@ export default function AboutPage() {
             <h2 className="text-3xl font-bold tracking-tight">
               About <span className="text-accent">Gradient Galore</span>
             </h2>
-            <div className="space-y-4 text-sm leading-relaxed text-text-dim">
+            <div className="space-y-4 text-base leading-relaxed text-text-dim">
               <p>
                 We were working on a project and needed a way to experiment with
                 aura, mesh, and marble gradients alongside our colour palettes.
@@ -75,7 +75,9 @@ export default function AboutPage() {
                 wanted, so we made one.
               </p>
               <p>
-                It started as an internal thing at our studio. We ended up using
+                It started as an internal thing at our studio. Mostly to save
+                time fiddling in DevTools and stop us having to jump into Penpot
+                every time we wanted to try a gradient idea. We ended up using
                 it enough that it seemed worth putting out there. Pick colours,
                 layer gradients, tweak things with OKLCH sliders, copy the CSS
                 when you're happy. That's about it.
@@ -89,7 +91,7 @@ export default function AboutPage() {
               <p className="text-xs text-text-dim">Made by</p>
               <h3 className="text-lg font-semibold">Blue Monkey Makes</h3>
             </div>
-            <p className="text-sm leading-relaxed text-text-dim">
+            <p className="text-base leading-relaxed text-text-dim">
               We're a small design and engineering studio. We build tools,
               products, and the occasional thing like this that we think
               someone else might find useful.
@@ -111,7 +113,7 @@ export default function AboutPage() {
           <section className="space-y-6">
             <div className="space-y-1">
               <h3 className="text-lg font-semibold">Colour Tools We Like</h3>
-              <p className="text-xs text-text-dim">
+              <p className="text-sm text-text-dim">
                 Other tools we use. Worth having in your bookmarks.
               </p>
             </div>
@@ -132,7 +134,7 @@ export default function AboutPage() {
                       <path strokeLinecap="round" strokeLinejoin="round" d="M7 17L17 7M17 7H7M17 7v10" />
                     </svg>
                   </div>
-                  <p className="text-xs text-text-dim leading-relaxed">
+                  <p className="text-sm text-text-dim leading-relaxed">
                     {tool.description}
                   </p>
                 </a>
@@ -144,7 +146,7 @@ export default function AboutPage() {
           <section className="space-y-6">
             <div className="space-y-1">
               <h3 className="text-lg font-semibold">Other Tools We Use</h3>
-              <p className="text-xs text-text-dim">
+              <p className="text-sm text-text-dim">
                 Not colour-related, just good.
               </p>
             </div>
@@ -165,7 +167,7 @@ export default function AboutPage() {
                       <path strokeLinecap="round" strokeLinejoin="round" d="M7 17L17 7M17 7H7M17 7v10" />
                     </svg>
                   </div>
-                  <p className="text-xs text-text-dim leading-relaxed">
+                  <p className="text-sm text-text-dim leading-relaxed">
                     {tool.description}
                   </p>
                 </a>
