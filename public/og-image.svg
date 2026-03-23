@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <radialGradient id="og-a" cx="20%" cy="30%" r="70%">
+      <stop offset="0%" stop-color="#8b5cf6" stop-opacity="0.6"/>
+      <stop offset="100%" stop-color="#8b5cf6" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="og-b" cx="75%" cy="15%" r="55%">
+      <stop offset="0%" stop-color="#06b6d4" stop-opacity="0.5"/>
+      <stop offset="100%" stop-color="#06b6d4" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="og-c" cx="45%" cy="75%" r="45%">
+      <stop offset="0%" stop-color="#ec4899" stop-opacity="0.5"/>
+      <stop offset="60%" stop-color="#ec4899" stop-opacity="0.15"/>
+      <stop offset="100%" stop-color="#ec4899" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="og-d" cx="85%" cy="80%" r="50%">
+      <stop offset="0%" stop-color="#f97316" stop-opacity="0.4"/>
+      <stop offset="100%" stop-color="#f97316" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1200" height="630" fill="#0a0a0c"/>
+  <rect width="1200" height="630" fill="url(#og-a)"/>
+  <rect width="1200" height="630" fill="url(#og-b)"/>
+  <rect width="1200" height="630" fill="url(#og-c)"/>
+  <rect width="1200" height="630" fill="url(#og-d)"/>
+  <text x="600" y="270" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="72" font-weight="700" fill="#e4e4e7" letter-spacing="-2">Gradient <tspan fill="#d4d4d8">Galore</tspan></text>
+  <text x="600" y="340" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="24" fill="#71717a">Aura, mesh, marble, and classic gradients. Copy the CSS.</text>
+  <text x="600" y="530" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="16" fill="#52525b">Made by Blue Monkey Makes</text>
+</svg>

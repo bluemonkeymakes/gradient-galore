@@ -33,11 +33,13 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <meta property="og:type" content="website" />
         <meta property="og:title" content="Gradient Galore" />
-        <meta property="og:description" content="Create beautiful aura, mesh, marble, and classic gradients. Export production-ready CSS instantly." />
+        <meta property="og:description" content="Aura, mesh, marble, and classic gradients. Copy the CSS." />
+        <meta property="og:image" content="/og-image.png" />
         <meta property="og:site_name" content="Gradient Galore" />
-        <meta name="twitter:card" content="summary" />
+        <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="Gradient Galore" />
-        <meta name="twitter:description" content="Create beautiful aura, mesh, marble, and classic gradients. Export production-ready CSS instantly." />
+        <meta name="twitter:description" content="Aura, mesh, marble, and classic gradients. Copy the CSS." />
+        <meta name="twitter:image" content="/og-image.png" />
         <meta name="theme-color" content="#09090b" />
         <Meta />
         <Links />
