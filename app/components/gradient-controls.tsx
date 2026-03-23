@@ -530,6 +530,16 @@ function swap<T>(arr: T[], i: number, j: number): T[] {
   return copy;
 }
 
+/** Swap position values between two color stops (moves them along the gradient axis) */
+function swapPositions(stops: ColorStop[], i: number, j: number): ColorStop[] {
+  if (i < 0 || j < 0 || i >= stops.length || j >= stops.length) return stops;
+  return stops.map((s, idx) => {
+    if (idx === i) return { ...s, position: stops[j].position };
+    if (idx === j) return { ...s, position: stops[i].position };
+    return s;
+  });
+}
+
 /** Shared controls for the background gradient layer (aura/mesh) */
 function BgGradientControls({
   state, setState, set, activeTarget, setActiveTarget, updateColors, addColor,
@@ -569,8 +579,8 @@ function BgGradientControls({
             onSelect={() => setActiveTarget({ type: "color", id: stop.id })}
             onChange={(updated) => updateColors(state.colors.map((c) => (c.id === updated.id ? updated : c)))}
             onDelete={() => updateColors(state.colors.filter((c) => c.id !== stop.id))}
-            onMoveUp={() => updateColors(swap(state.colors, idx, idx - 1))}
-            onMoveDown={() => updateColors(swap(state.colors, idx, idx + 1))} />
+            onMoveUp={() => updateColors(swapPositions(state.colors, idx, idx - 1))}
+            onMoveDown={() => updateColors(swapPositions(state.colors, idx, idx + 1))} />
         ))}
       </div>
       <button onClick={addColor}
@@ -983,8 +993,8 @@ export function GradientControls() {
                 onSelect={() => setActiveTarget({ type: "color", id: stop.id })}
                 onChange={(updated) => updateColors(state.colors.map((c) => (c.id === updated.id ? updated : c)))}
                 onDelete={() => updateColors(state.colors.filter((c) => c.id !== stop.id))}
-                onMoveUp={() => updateColors(swap(state.colors, idx, idx - 1))}
-                onMoveDown={() => updateColors(swap(state.colors, idx, idx + 1))} />
+                onMoveUp={() => updateColors(swapPositions(state.colors, idx, idx - 1))}
+                onMoveDown={() => updateColors(swapPositions(state.colors, idx, idx + 1))} />
             ))}
           </div>
           <button onClick={addColor}
