@@ -98,7 +98,7 @@ export function generateGradientName(state: GradientState): string {
   const avgC = colors.reduce((s, c) => s + c.C, 0) / colors.length;
   const dominantHue = colors.reduce((best, c) => (c.C > best.C ? c : best), colors[0]);
   const hue = hueName(dominantHue.h);
-  const seed = hashStr(hexColors.join(""));
+  const seed = hashStr(`${state.type}-${state.angle}-${hexColors.join("")}`);
 
   // Pick a mood word from the dominant hue
   const moodWords = HUE_MOODS[hue] ?? HUE_MOODS.neutral;

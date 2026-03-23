@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useLoaderData, useSearchParams, Link, useFetcher, useNavigate } from "react-router";
 import { useSetAtom } from "jotai";
 import { db } from "~/db";
@@ -8,7 +9,7 @@ import { Nav } from "~/components/nav";
 import { GRADIENT_TYPES, applyPaletteToGradient, type GradientState } from "~/lib/gradient-engine";
 import { GradientThumbnail } from "~/components/gradient-thumbnail";
 import { activePaletteAtom, gradientAtom, pushGradientHistoryAtom } from "~/lib/atoms";
-import type { PaletteColor, PaletteShade } from "~/lib/palette";
+import { hexToOklch, type PaletteColor, type PaletteShade } from "~/lib/palette";
 import type { Route } from "./+types/gallery";
 
 const CATEGORIES = [
@@ -273,17 +274,38 @@ export default function GalleryPage() {
     setSearchParams(params);
   };
 
-  // Build unified items sorted by createdAt desc
+  const [sortBy, setSortBy] = useState<"recent" | "color">("recent");
+
   type GalleryItem =
     | { kind: "gradient"; item: (typeof gradientItems)[number] }
     | { kind: "palette"; item: (typeof paletteItems)[number] };
 
+  const getDominantHue = (entry: GalleryItem): number => {
+    if (entry.kind === "gradient") {
+      try {
+        const state: GradientState = JSON.parse(entry.item.state);
+        const hex = state.colors?.[0]?.color ?? "#000000";
+        return hexToOklch(hex).h;
+      } catch { return 0; }
+    } else {
+      const parsed: PaletteColor[] = (() => {
+        try {
+          const p = JSON.parse(entry.item.shades);
+          return Array.isArray(p) && p.length > 0 && "base" in p[0] ? p : [];
+        } catch { return []; }
+      })();
+      const hex = parsed[0]?.base ?? "#000000";
+      return hexToOklch(hex).h;
+    }
+  };
+
   const allItems: GalleryItem[] = [
     ...gradientItems.map((g) => ({ kind: "gradient" as const, item: g })),
     ...paletteItems.map((p) => ({ kind: "palette" as const, item: p })),
-  ].sort(
-    (a, b) =>
-      new Date(b.item.createdAt).getTime() - new Date(a.item.createdAt).getTime()
+  ].sort((a, b) =>
+    sortBy === "color"
+      ? getDominantHue(a) - getDominantHue(b)
+      : new Date(b.item.createdAt).getTime() - new Date(a.item.createdAt).getTime()
   );
 
   return (
@@ -308,9 +330,9 @@ export default function GalleryPage() {
             </Link>
           </div>
 
-          {/* Category filters */}
+          {/* Filters + sort */}
           <div className="space-y-2">
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-2 items-center">
               {CATEGORIES.map((c) => (
                 <button
                   key={c.value}
@@ -324,6 +346,19 @@ export default function GalleryPage() {
                   {c.label}
                 </button>
               ))}
+
+              <span className="w-px h-5 bg-border hidden sm:block" />
+
+              <button
+                onClick={() => setSortBy(sortBy === "recent" ? "color" : "recent")}
+                className={`px-3 py-2 rounded-lg text-sm sm:text-xs font-medium transition-all ${
+                  sortBy === "color"
+                    ? "bg-surface-3 text-text"
+                    : "text-text-dim hover:text-text"
+                }`}
+              >
+                {sortBy === "color" ? "Sorted by Color" : "Sort by Color"}
+              </button>
             </div>
 
             {/* Gradient sub-type filters */}
