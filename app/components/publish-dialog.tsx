@@ -145,10 +145,31 @@ export function PublishButton() {
               </button>
               <button
                 onClick={handleSubmit}
-                disabled={isSubmitting}
-                className="flex-1 py-2.5 rounded-xl bg-accent text-black text-sm font-medium hover:bg-accent-hover transition-all disabled:opacity-50"
+                disabled={isSubmitting || isDone}
+                className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-all flex items-center justify-center gap-2 ${
+                  isDone
+                    ? "bg-green-500/20 text-green-400 border border-green-500/30"
+                    : "bg-accent text-black hover:bg-accent-hover disabled:opacity-50"
+                }`}
               >
-                {isDone ? "Published!" : isSubmitting ? "Publishing..." : "Publish"}
+                {isDone ? (
+                  <>
+                    <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                    </svg>
+                    Published
+                  </>
+                ) : isSubmitting ? (
+                  <>
+                    <svg className="w-4 h-4 animate-spin" viewBox="0 0 24 24" fill="none">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth={3} />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                    </svg>
+                    Publishing...
+                  </>
+                ) : (
+                  "Publish"
+                )}
               </button>
             </div>
           </div>
