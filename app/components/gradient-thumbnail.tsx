@@ -99,9 +99,9 @@ export function GradientThumbnail({
             <div className="absolute inset-0" style={{ backgroundImage: bgGradientCss }} />
           )}
           {useBlobs && state.type === "aura" &&
-            state.auraPoints?.filter((p) => p.visible !== false).map((p) => <AuraBlobLayer key={p.id} point={p} />)}
+            [...(state.auraPoints ?? [])].filter((p) => p.visible !== false).reverse().map((p) => <AuraBlobLayer key={p.id} point={p} />)}
           {useBlobs && state.type === "mesh" &&
-            state.meshPoints?.filter((p) => p.visible !== false).map((p) => <MeshBlobLayer key={p.id} point={p} />)}
+            [...(state.meshPoints ?? [])].filter((p) => p.visible !== false).reverse().map((p) => <MeshBlobLayer key={p.id} point={p} />)}
         </div>
       )}
       <NoiseLayer state={state} />
