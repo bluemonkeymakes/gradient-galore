@@ -1,4 +1,16 @@
 services:
+  app:
+    build: .
+    restart: unless-stopped
+    ports:
+      - "${APP_PORT:-3000}:3000"
+    environment:
+      DATABASE_URL: postgres://${POSTGRES_USER:-gradient}:${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}@db:5432/${POSTGRES_DB:-gradient_galore}
+      ADMIN_SECRET: ${ADMIN_SECRET:-}
+    depends_on:
+      db:
+        condition: service_healthy
+
   db:
     image: postgres:16-alpine
     restart: unless-stopped
@@ -6,10 +18,13 @@ services:
       POSTGRES_DB: ${POSTGRES_DB:-gradient_galore}
       POSTGRES_USER: ${POSTGRES_USER:-gradient}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
-    ports:
-      - "${POSTGRES_PORT:-5435}:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-gradient}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
 volumes:
   pgdata:
