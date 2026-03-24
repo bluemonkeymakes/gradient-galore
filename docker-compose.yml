@@ -2,8 +2,6 @@ services:
   app:
     build: .
     restart: unless-stopped
-    ports:
-      - "${APP_PORT:-3000}:3000"
     environment:
       DATABASE_URL: postgres://${POSTGRES_USER:-gradient}:${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}@db:5432/${POSTGRES_DB:-gradient_galore}
       ADMIN_SECRET: ${ADMIN_SECRET:-}
