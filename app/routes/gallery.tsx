@@ -301,36 +301,63 @@ export default function GalleryPage() {
     }
   };
 
-  // Color fingerprint: chroma-weighted average hue of all colors.
-  // Items sharing the same palette colors get the same fingerprint
-  // and naturally cluster together.
-  const getColorFingerprint = (entry: GalleryItem): number => {
+  // Color set fingerprint: quantize hues into 30° buckets, sort, join as string.
+  // Items with the same set of color families get the same fingerprint
+  // and cluster together — a palette and gradients using its colors will match.
+  const getColorSignature = (entry: GalleryItem): string => {
     const hexes = getColors(entry);
-    if (hexes.length === 0) return 0;
+    if (hexes.length === 0) return "z";
     const oklchs = hexes.map(hexToOklch);
-    const totalChroma = oklchs.reduce((s, c) => s + c.C, 0);
-    if (totalChroma === 0) return 0;
-    // Use circular mean to handle hue wrapping (e.g., 350° and 10° are close)
-    const sinSum = oklchs.reduce((s, c) => s + c.C * Math.sin((c.h * Math.PI) / 180), 0);
-    const cosSum = oklchs.reduce((s, c) => s + c.C * Math.cos((c.h * Math.PI) / 180), 0);
-    const avgHue = ((Math.atan2(sinSum, cosSum) * 180) / Math.PI + 360) % 360;
-    return avgHue;
+    // Only consider chromatic colors (skip near-gray)
+    const chromatic = oklchs.filter((c) => c.C > 0.03);
+    if (chromatic.length === 0) return "neutral";
+    // Quantize each hue to a 30° bucket (12 buckets around the wheel)
+    const buckets = [...new Set(chromatic.map((c) => Math.round(c.h / 30) % 12))].sort((a, b) => a - b);
+    return buckets.join("-");
   };
 
-  const allItems: GalleryItem[] = [
-    ...gradientItems.map((g) => ({ kind: "gradient" as const, item: g })),
-    ...paletteItems.map((p) => ({ kind: "palette" as const, item: p })),
-  ].sort((a, b) => {
-    if (sortBy === "color") {
-      const diff = getColorFingerprint(a) - getColorFingerprint(b);
-      // Within same hue band (~15° tolerance), sort by date
-      if (Math.abs(diff) < 15) {
-        return new Date(b.item.createdAt).getTime() - new Date(a.item.createdAt).getTime();
-      }
-      return diff;
+  // Primary sort key for the group (lowest bucket = determines group position on the wheel)
+  const getGroupHue = (sig: string): number => {
+    if (sig === "z" || sig === "neutral") return 999;
+    const first = parseInt(sig.split("-")[0]);
+    return first;
+  };
+
+  const allItems: GalleryItem[] = (() => {
+    const items: GalleryItem[] = [
+      ...gradientItems.map((g) => ({ kind: "gradient" as const, item: g })),
+      ...paletteItems.map((p) => ({ kind: "palette" as const, item: p })),
+    ];
+
+    if (sortBy !== "color") {
+      return items.sort((a, b) =>
+        new Date(b.item.createdAt).getTime() - new Date(a.item.createdAt).getTime()
+      );
     }
-    return new Date(b.item.createdAt).getTime() - new Date(a.item.createdAt).getTime();
-  });
+
+    // Group by color signature, then sort groups by hue position
+    const groups = new Map<string, GalleryItem[]>();
+    for (const item of items) {
+      const sig = getColorSignature(item);
+      if (!groups.has(sig)) groups.set(sig, []);
+      groups.get(sig)!.push(item);
+    }
+
+    // Within each group: palettes first, then gradients, then by date
+    for (const group of groups.values()) {
+      group.sort((a, b) => {
+        if (a.kind !== b.kind) return a.kind === "palette" ? -1 : 1;
+        return new Date(b.item.createdAt).getTime() - new Date(a.item.createdAt).getTime();
+      });
+    }
+
+    // Sort groups by hue position on the color wheel
+    const sortedGroups = [...groups.entries()].sort(
+      (a, b) => getGroupHue(a[0]) - getGroupHue(b[0])
+    );
+
+    return sortedGroups.flatMap(([, items]) => items);
+  })();
 
   return (
     <div className="min-h-screen flex flex-col">
