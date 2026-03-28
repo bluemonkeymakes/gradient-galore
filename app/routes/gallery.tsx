@@ -301,26 +301,15 @@ export default function GalleryPage() {
     }
   };
 
-  // Color set fingerprint: quantize hues into 30° buckets, sort, join as string.
-  // Items with the same set of color families get the same fingerprint
-  // and cluster together — a palette and gradients using its colors will match.
-  const getColorSignature = (entry: GalleryItem): string => {
+  // Sort key: the hue of the most vivid (highest chroma) color in the item.
+  // Items sharing similar dominant colors cluster naturally on the wheel.
+  const getPrimaryHue = (entry: GalleryItem): number => {
     const hexes = getColors(entry);
-    if (hexes.length === 0) return "z";
+    if (hexes.length === 0) return 999;
     const oklchs = hexes.map(hexToOklch);
-    // Only consider chromatic colors (skip near-gray)
     const chromatic = oklchs.filter((c) => c.C > 0.03);
-    if (chromatic.length === 0) return "neutral";
-    // Quantize each hue to a 30° bucket (12 buckets around the wheel)
-    const buckets = [...new Set(chromatic.map((c) => Math.round(c.h / 30) % 12))].sort((a, b) => a - b);
-    return buckets.join("-");
-  };
-
-  // Primary sort key for the group (lowest bucket = determines group position on the wheel)
-  const getGroupHue = (sig: string): number => {
-    if (sig === "z" || sig === "neutral") return 999;
-    const first = parseInt(sig.split("-")[0]);
-    return first;
+    if (chromatic.length === 0) return 998;
+    return chromatic.reduce((a, b) => (a.C > b.C ? a : b)).h;
   };
 
   const allItems: GalleryItem[] = (() => {
@@ -335,28 +324,15 @@ export default function GalleryPage() {
       );
     }
 
-    // Group by color signature, then sort groups by hue position
-    const groups = new Map<string, GalleryItem[]>();
-    for (const item of items) {
-      const sig = getColorSignature(item);
-      if (!groups.has(sig)) groups.set(sig, []);
-      groups.get(sig)!.push(item);
-    }
-
-    // Within each group: palettes first, then gradients, then by date
-    for (const group of groups.values()) {
-      group.sort((a, b) => {
-        if (a.kind !== b.kind) return a.kind === "palette" ? -1 : 1;
-        return new Date(b.item.createdAt).getTime() - new Date(a.item.createdAt).getTime();
-      });
-    }
-
-    // Sort groups by hue position on the color wheel
-    const sortedGroups = [...groups.entries()].sort(
-      (a, b) => getGroupHue(a[0]) - getGroupHue(b[0])
-    );
-
-    return sortedGroups.flatMap(([, items]) => items);
+    // Sort by dominant hue; palettes before gradients at similar hues
+    return items.sort((a, b) => {
+      const hueA = getPrimaryHue(a);
+      const hueB = getPrimaryHue(b);
+      if (Math.abs(hueA - hueB) > 15) return hueA - hueB;
+      // Within same hue neighbourhood: palettes first, then by date
+      if (a.kind !== b.kind) return a.kind === "palette" ? -1 : 1;
+      return new Date(b.item.createdAt).getTime() - new Date(a.item.createdAt).getTime();
+    });
   })();
 
   return (

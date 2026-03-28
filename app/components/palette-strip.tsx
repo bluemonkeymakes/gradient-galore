@@ -52,8 +52,8 @@ export function PaletteStrip() {
   };
 
   return (
-    <div className="space-y-2">
-      <div className="flex items-center justify-between">
+    <div className="rounded-xl border border-border overflow-hidden">
+      <div className="flex items-center justify-between px-3 py-2.5 bg-surface-3">
         <h3 className="text-xs font-semibold uppercase tracking-wider text-text-dim">
           {palette.name}
         </h3>
@@ -62,6 +62,7 @@ export function PaletteStrip() {
         </Link>
       </div>
 
+      <div className="px-3 py-3 space-y-2">
       {!target && (
         <div className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg bg-surface text-[10px] text-text-dim/60">
           <svg className="w-3 h-3 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
@@ -137,6 +138,7 @@ export function PaletteStrip() {
           </div>
         );
       })()}
+      </div>
     </div>
   );
 }

@@ -1,11 +1,12 @@
-import { generateCSS, generateBgGradientCSS, hexToRgba, type GradientState, type AuraPoint, type MeshPoint } from "~/lib/gradient-engine";
+import { generateCSS, generateBgGradientCSS, hexToRgba, stretchRatio, type GradientState, type AuraPoint, type MeshPoint } from "~/lib/gradient-engine";
 import { MarbleSvg } from "~/components/marble-canvas";
 
 function AuraBlobLayer({ point }: { point: AuraPoint }) {
-  const ratio = (point.stretch ?? 50) / 50;
-  const w = point.size * ratio * 0.5;
-  const h = point.size * (2 - ratio) * 0.5;
-  const fadeEnd = Math.round(Math.max(w, h) * 0.7);
+  const { wRatio, hRatio } = stretchRatio(point.stretch);
+  const w = point.size * wRatio * 0.5;
+  const h = point.size * hRatio * 0.5;
+  const hard = point.hardness ?? 0;
+  const fadeEnd = hard + Math.round((100 - hard) * 0.7);
   const color = hexToRgba(point.color, point.opacity);
   const fadeMid = hexToRgba(point.color, point.opacity * 0.4);
 
@@ -13,7 +14,7 @@ function AuraBlobLayer({ point }: { point: AuraPoint }) {
     <div
       className="absolute -inset-1/2 pointer-events-none"
       style={{
-        backgroundImage: `radial-gradient(ellipse ${w}% ${h}% at 50% 50%, ${color} 0%, ${fadeMid} ${fadeEnd}%, transparent 100%)`,
+        backgroundImage: `radial-gradient(ellipse ${w}% ${h}% at 50% 50%, ${color} ${hard}%, ${fadeMid} ${fadeEnd}%, transparent 100%)`,
         transform: `translate(${(point.x - 50) * 0.5}%, ${(point.y - 50) * 0.5}%) rotate(${point.rotate ?? 0}deg)`,
       }}
     />
@@ -21,16 +22,17 @@ function AuraBlobLayer({ point }: { point: AuraPoint }) {
 }
 
 function MeshBlobLayer({ point }: { point: MeshPoint }) {
-  const ratio = (point.stretch ?? 50) / 50;
-  const w = point.spread * ratio * 0.5;
-  const h = point.spread * (2 - ratio) * 0.5;
+  const { wRatio, hRatio } = stretchRatio(point.stretch);
+  const w = point.spread * wRatio * 0.5;
+  const h = point.spread * hRatio * 0.5;
+  const hard = point.hardness ?? 0;
   const color = point.opacity < 100 ? hexToRgba(point.color, point.opacity) : point.color;
 
   return (
     <div
       className="absolute -inset-1/2 pointer-events-none"
       style={{
-        backgroundImage: `radial-gradient(ellipse ${w}% ${h}% at 50% 50%, ${color} 0%, transparent 100%)`,
+        backgroundImage: `radial-gradient(ellipse ${w}% ${h}% at 50% 50%, ${color} ${hard}%, transparent 100%)`,
         transform: `translate(${(point.x - 50) * 0.5}%, ${(point.y - 50) * 0.5}%) rotate(${point.rotate ?? 0}deg)`,
       }}
     />

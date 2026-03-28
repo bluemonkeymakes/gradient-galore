@@ -34,7 +34,8 @@ export interface AuraPoint {
   color: string;
   x: number; // 0-100
   y: number; // 0-100
-  size: number; // 10-100, how far the glow extends
+  size: number; // 1-200, how far the glow extends
+  hardness: number; // 0-100, how much solid center before fade starts
   opacity: number; // 0-100
   stretch: number; // 0-100, 50 = circle, <50 = tall, >50 = wide
   rotate: number; // 0-360
@@ -46,7 +47,8 @@ export interface MeshPoint {
   color: string;
   x: number; // 0-100
   y: number; // 0-100
-  spread: number; // 10-100
+  spread: number; // 1-200
+  hardness: number; // 0-100, how much solid center before fade starts
   opacity: number; // 0-100
   stretch: number; // 0-100, 50 = circle, <50 = tall, >50 = wide
   rotate: number; // 0-360
@@ -103,18 +105,18 @@ export function defaultColors(): ColorStop[] {
 
 export function defaultAuraPoints(): AuraPoint[] {
   return [
-    { id: createId(), color: "#a855f7", x: 30, y: 35, size: 70, opacity: 70, stretch: 50, rotate: 0 },
-    { id: createId(), color: "#3b82f6", x: 60, y: 45, size: 65, opacity: 60, stretch: 60, rotate: 30 },
-    { id: createId(), color: "#06b6d4", x: 45, y: 70, size: 75, opacity: 55, stretch: 40, rotate: 120 },
+    { id: createId(), color: "#a855f7", x: 30, y: 35, size: 70, hardness: 0, opacity: 70, stretch: 50, rotate: 0 },
+    { id: createId(), color: "#3b82f6", x: 60, y: 45, size: 65, hardness: 0, opacity: 60, stretch: 60, rotate: 30 },
+    { id: createId(), color: "#06b6d4", x: 45, y: 70, size: 75, hardness: 0, opacity: 55, stretch: 40, rotate: 120 },
   ];
 }
 
 export function defaultMeshPoints(): MeshPoint[] {
   return [
-    { id: createId(), color: "#8b5cf6", x: 20, y: 20, spread: 40, opacity: 100, stretch: 50, rotate: 0 },
-    { id: createId(), color: "#ec4899", x: 80, y: 20, spread: 40, opacity: 100, stretch: 65, rotate: 45 },
-    { id: createId(), color: "#06b6d4", x: 50, y: 80, spread: 40, opacity: 100, stretch: 50, rotate: 0 },
-    { id: createId(), color: "#f97316", x: 80, y: 70, spread: 35, opacity: 80, stretch: 35, rotate: 90 },
+    { id: createId(), color: "#8b5cf6", x: 20, y: 20, spread: 40, hardness: 0, opacity: 100, stretch: 50, rotate: 0 },
+    { id: createId(), color: "#ec4899", x: 80, y: 20, spread: 40, hardness: 0, opacity: 100, stretch: 65, rotate: 45 },
+    { id: createId(), color: "#06b6d4", x: 50, y: 80, spread: 40, hardness: 0, opacity: 100, stretch: 50, rotate: 0 },
+    { id: createId(), color: "#f97316", x: 80, y: 70, spread: 35, hardness: 0, opacity: 80, stretch: 35, rotate: 90 },
   ];
 }
 
@@ -229,6 +231,13 @@ export function generateBgGradientCSS(state: GradientState): string | null {
   }
 }
 
+/** Area-preserving stretch: 50 = circle, 0 = 3:1 tall, 100 = 3:1 wide */
+export function stretchRatio(stretch: number): { wRatio: number; hRatio: number } {
+  const s = ((stretch ?? 50) - 50) / 50; // -1 to 1
+  const factor = Math.pow(3, s); // 1/3 to 3, 1 at center
+  return { wRatio: factor, hRatio: 1 / factor };
+}
+
 export function hexToRgba(hex: string, opacity: number): string {
   const h = hex.replace("#", "");
   const r = parseInt(h.substring(0, 2), 16);
@@ -259,14 +268,14 @@ export function generateCSS(state: GradientState): string {
     }
 
     case "aura": {
-      // Stretch: 50=circle, <50=tall, >50=wide
       const layers = state.auraPoints.filter((p) => p.visible !== false).map((p) => {
         const color = hexToRgba(p.color, p.opacity);
-        const ratio = (p.stretch ?? 50) / 50; // 0-2, 1=circle
-        const w = Math.round(p.size * ratio);
-        const h = Math.round(p.size * (2 - ratio));
-        const fadeEnd = Math.round(Math.max(w, h) * 0.7);
-        return `radial-gradient(ellipse ${w}% ${h}% at ${p.x}% ${p.y}%, ${color} 0%, ${hexToRgba(p.color, p.opacity * 0.4)} ${fadeEnd}%, transparent 100%)`;
+        const { wRatio, hRatio } = stretchRatio(p.stretch);
+        const w = Math.round(p.size * wRatio);
+        const h = Math.round(p.size * hRatio);
+        const hard = p.hardness ?? 0;
+        const fadeEnd = hard + Math.round((100 - hard) * 0.7);
+        return `radial-gradient(ellipse ${w}% ${h}% at ${p.x}% ${p.y}%, ${color} ${hard}%, ${hexToRgba(p.color, p.opacity * 0.4)} ${fadeEnd}%, transparent 100%)`;
       });
       return layers.join(", ");
     }
@@ -277,10 +286,11 @@ export function generateCSS(state: GradientState): string {
     case "mesh": {
       const layers = state.meshPoints.filter((p) => p.visible !== false).map((p) => {
         const color = p.opacity < 100 ? hexToRgba(p.color, p.opacity) : p.color;
-        const ratio = (p.stretch ?? 50) / 50;
-        const w = Math.round(p.spread * ratio);
-        const h = Math.round(p.spread * (2 - ratio));
-        return `radial-gradient(ellipse ${w}% ${h}% at ${p.x}% ${p.y}%, ${color} 0%, transparent 100%)`;
+        const { wRatio, hRatio } = stretchRatio(p.stretch);
+        const w = Math.round(p.spread * wRatio);
+        const h = Math.round(p.spread * hRatio);
+        const hard = p.hardness ?? 0;
+        return `radial-gradient(ellipse ${w}% ${h}% at ${p.x}% ${p.y}%, ${color} ${hard}%, transparent 100%)`;
       });
       return layers.join(", ");
     }
@@ -334,16 +344,17 @@ export function generateFullCSS(state: GradientState): string {
     const hasRotation = visibleAura.some((p) => (p.rotate ?? 0) !== 0);
     if (hasRotation) {
       const layers = visibleAura.map((p, i) => {
-        const ratio = (p.stretch ?? 50) / 50;
-        const w = p.size * ratio * 0.5;
-        const h = p.size * (2 - ratio) * 0.5;
-        const fadeEnd = Math.round(Math.max(w, h) * 0.7);
+        const { wRatio, hRatio } = stretchRatio(p.stretch);
+        const w = p.size * wRatio * 0.5;
+        const h = p.size * hRatio * 0.5;
+        const hard = p.hardness ?? 0;
+        const fadeEnd = hard + Math.round((100 - hard) * 0.7);
         const color = hexToRgba(p.color, p.opacity);
         const fadeMid = hexToRgba(p.color, p.opacity * 0.4);
         return `.gradient__layer-${i + 1} {
   position: absolute;
   inset: -50%;
-  background: radial-gradient(ellipse ${w}% ${h}% at 50% 50%, ${color} 0%, ${fadeMid} ${fadeEnd}%, transparent 100%);
+  background: radial-gradient(ellipse ${w}% ${h}% at 50% 50%, ${color} ${hard}%, ${fadeMid} ${fadeEnd}%, transparent 100%);
   transform: translate(${((p.x - 50) * 0.5).toFixed(1)}%, ${((p.y - 50) * 0.5).toFixed(1)}%) rotate(${p.rotate}deg);
 }`;
       });
@@ -367,14 +378,15 @@ ${layers.join("\n")}`;
     const hasRotation = visibleMesh.some((p) => (p.rotate ?? 0) !== 0);
     if (hasRotation) {
       const layers = visibleMesh.map((p, i) => {
-        const ratio = (p.stretch ?? 50) / 50;
-        const w = p.spread * ratio * 0.5;
-        const h = p.spread * (2 - ratio) * 0.5;
+        const { wRatio, hRatio } = stretchRatio(p.stretch);
+        const w = p.spread * wRatio * 0.5;
+        const h = p.spread * hRatio * 0.5;
+        const hard = p.hardness ?? 0;
         const color = p.opacity < 100 ? hexToRgba(p.color, p.opacity) : p.color;
         return `.gradient__layer-${i + 1} {
   position: absolute;
   inset: -50%;
-  background: radial-gradient(ellipse ${w}% ${h}% at 50% 50%, ${color} 0%, transparent 100%);
+  background: radial-gradient(ellipse ${w}% ${h}% at 50% 50%, ${color} ${hard}%, transparent 100%);
   transform: translate(${((p.x - 50) * 0.5).toFixed(1)}%, ${((p.y - 50) * 0.5).toFixed(1)}%) rotate(${p.rotate}deg);
 }`;
       });
@@ -425,6 +437,7 @@ export function applyPaletteToGradient(state: GradientState, baseColors: string[
       x: Math.round(20 + (60 / Math.max(1, baseColors.length - 1)) * i),
       y: Math.round(30 + Math.sin(i * 1.5) * 20 + 20),
       size: 65,
+      hardness: 0,
       opacity: 70 - i * 5,
       stretch: 50,
       rotate: Math.round(i * 40),
@@ -442,6 +455,7 @@ export function applyPaletteToGradient(state: GradientState, baseColors: string[
       x: positions[i]?.[0] ?? Math.round(20 + Math.random() * 60),
       y: positions[i]?.[1] ?? Math.round(20 + Math.random() * 60),
       spread: 40,
+      hardness: 0,
       opacity: 100,
       stretch: 50,
       rotate: 0,

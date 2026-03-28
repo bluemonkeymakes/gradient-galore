@@ -59,7 +59,7 @@ export function PublishButton() {
     <>
       <button
         onClick={() => setOpen(true)}
-        className="shrink-0 px-4 py-2 rounded-xl bg-accent text-black text-sm font-medium hover:bg-accent-hover transition-all"
+        className="shrink-0 px-4 py-2 rounded-xl border border-border text-sm font-medium text-text-dim hover:text-text hover:border-accent transition-all"
       >
         Publish
       </button>
@@ -148,13 +148,13 @@ export function PublishButton() {
                 disabled={isSubmitting || isDone}
                 className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-all flex items-center justify-center gap-2 ${
                   isDone
-                    ? "bg-green-500/20 text-green-400 border border-green-500/30"
+                    ? "bg-surface-3 text-text-dim border border-border"
                     : "bg-accent text-black hover:bg-accent-hover disabled:opacity-50"
                 }`}
               >
                 {isDone ? (
                   <>
-                    <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5}>
+                    <svg className="w-4 h-4 text-green-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                     </svg>
                     Published

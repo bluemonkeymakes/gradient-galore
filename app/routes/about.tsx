@@ -44,6 +44,12 @@ const COLOR_TOOLS = [
     description:
       "Traditional Japanese colour collection. Great for finding muted, earthy tones you wouldn't stumble on otherwise.",
   },
+  {
+    name: "Mshr",
+    url: "https://www.mshr.app/",
+    description:
+      "Beautiful mesh gradient editor. Honestly one of the best out there for organic, layered gradients.",
+  },
 ];
 
 const OTHER_TOOLS = [

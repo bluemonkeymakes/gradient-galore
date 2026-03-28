@@ -284,7 +284,7 @@ function ColorStopEditor({
   );
 }
 
-function PointEditor<T extends { id: string; color: string; x: number; y: number; opacity: number; stretch: number; rotate: number; visible?: boolean }>({
+function PointEditor<T extends { id: string; color: string; x: number; y: number; hardness: number; opacity: number; stretch: number; rotate: number; visible?: boolean }>({
   point, canDelete, isSelected, isFirst, isLast, sizeLabel, sizeValue, sizeMin, sizeMax,
   onSelect, onSizeChange, onChange, onDelete, onMoveUp, onMoveDown,
 }: {
@@ -355,9 +355,10 @@ function PointEditor<T extends { id: string; color: string; x: number; y: number
           <AngleDial compact value={point.rotate} onChange={(v) => onChange({ ...point, rotate: v })} />
         </div>
       </div>
-      <div className="grid grid-cols-3 gap-x-4 gap-y-2.5 pt-1">
+      <div className="grid grid-cols-2 gap-x-4 gap-y-2.5 pt-1">
         <MiniSlider label={sizeLabel} value={sizeValue} min={sizeMin} max={sizeMax} onChange={onSizeChange} />
-        <MiniSlider label="Opac" value={point.opacity} min={0} max={100} onChange={(v) => onChange({ ...point, opacity: v })} />
+        <MiniSlider label="Hardness" value={point.hardness} min={0} max={100} onChange={(v) => onChange({ ...point, hardness: v })} />
+        <MiniSlider label="Opacity" value={point.opacity} min={0} max={100} onChange={(v) => onChange({ ...point, opacity: v })} />
         <MiniSlider label="Stretch" value={point.stretch} min={0} max={100} onChange={(v) => onChange({ ...point, stretch: v })} />
       </div>
     </div>
@@ -530,14 +531,16 @@ function swap<T>(arr: T[], i: number, j: number): T[] {
   return copy;
 }
 
-/** Swap position values between two color stops (moves them along the gradient axis) */
+/** Swap two color stops in the array AND exchange their position values */
 function swapPositions(stops: ColorStop[], i: number, j: number): ColorStop[] {
   if (i < 0 || j < 0 || i >= stops.length || j >= stops.length) return stops;
-  return stops.map((s, idx) => {
-    if (idx === i) return { ...s, position: stops[j].position };
-    if (idx === j) return { ...s, position: stops[i].position };
-    return s;
-  });
+  const copy = [...stops];
+  const posI = copy[i].position;
+  const posJ = copy[j].position;
+  copy[i] = { ...copy[i], position: posJ };
+  copy[j] = { ...copy[j], position: posI };
+  [copy[i], copy[j]] = [copy[j], copy[i]];
+  return copy;
 }
 
 /** Shared controls for the background gradient layer (aura/mesh) */
@@ -932,7 +935,7 @@ export function GradientControls() {
         id: newId,
         color: "#" + Math.floor(Math.random() * 16777215).toString(16).padStart(6, "0"),
         x, y,
-        size: 60 + Math.round(Math.random() * 20), opacity: 50 + Math.round(Math.random() * 30),
+        size: 60 + Math.round(Math.random() * 20), hardness: 0, opacity: 50 + Math.round(Math.random() * 30),
         stretch: 50, rotate: 0,
       },
     ]);
@@ -948,7 +951,7 @@ export function GradientControls() {
         id: newId,
         color: "#" + Math.floor(Math.random() * 16777215).toString(16).padStart(6, "0"),
         x, y,
-        spread: 35, opacity: 100, stretch: 50, rotate: 0,
+        spread: 35, hardness: 0, opacity: 100, stretch: 50, rotate: 0,
       },
     ]);
     setActiveTarget({ type: "mesh", id: newId });
@@ -1030,7 +1033,7 @@ export function GradientControls() {
                 isSelected={isTargetMatch(activeTarget, { type: "aura", id: point.id })}
                 isFirst={idx === 0} isLast={idx === state.auraPoints.length - 1}
                 onSelect={() => setActiveTarget({ type: "aura", id: point.id })}
-                sizeLabel="Size" sizeValue={point.size} sizeMin={10} sizeMax={100}
+                sizeLabel="Size" sizeValue={point.size} sizeMin={1} sizeMax={200}
                 onSizeChange={(v) => set("auraPoints", state.auraPoints.map((p) => p.id === point.id ? { ...p, size: v } : p))}
                 onChange={(updated) => set("auraPoints", state.auraPoints.map((p) => p.id === updated.id ? updated : p))}
                 onDelete={() => set("auraPoints", state.auraPoints.filter((p) => p.id !== point.id))}
@@ -1055,7 +1058,7 @@ export function GradientControls() {
                 isSelected={isTargetMatch(activeTarget, { type: "mesh", id: point.id })}
                 isFirst={idx === 0} isLast={idx === state.meshPoints.length - 1}
                 onSelect={() => setActiveTarget({ type: "mesh", id: point.id })}
-                sizeLabel="Size" sizeValue={point.spread} sizeMin={10} sizeMax={100}
+                sizeLabel="Size" sizeValue={point.spread} sizeMin={1} sizeMax={200}
                 onSizeChange={(v) => set("meshPoints", state.meshPoints.map((p) => p.id === point.id ? { ...p, spread: v } : p))}
                 onChange={(updated) => set("meshPoints", state.meshPoints.map((p) => p.id === updated.id ? updated : p))}
                 onDelete={() => set("meshPoints", state.meshPoints.filter((p) => p.id !== point.id))}
@@ -1104,7 +1107,7 @@ export function GradientControls() {
 
       {state.type === "aura" && (
         <Section title="Background">
-          <div className={`flex items-center gap-3 rounded-lg p-1 -m-1 transition-colors ${isTargetMatch(activeTarget, { type: "auraBg" }) ? "bg-accent/10" : ""}`}>
+          <div className={`flex items-center gap-3 rounded-lg p-2 transition-colors ${isTargetMatch(activeTarget, { type: "auraBg" }) ? "bg-accent/10" : ""}`}>
             <SelectableColor color={state.auraBgColor}
               isSelected={isTargetMatch(activeTarget, { type: "auraBg" })}
               onSelect={() => setActiveTarget({ type: "auraBg" })}
@@ -1153,7 +1156,7 @@ export function GradientControls() {
 
       {state.type === "mesh" && (
         <Section title="Background">
-          <div className={`flex items-center gap-3 rounded-lg p-1 -m-1 transition-colors ${isTargetMatch(activeTarget, { type: "meshBg" }) ? "bg-accent/10" : ""}`}>
+          <div className={`flex items-center gap-3 rounded-lg p-2 transition-colors ${isTargetMatch(activeTarget, { type: "meshBg" }) ? "bg-accent/10" : ""}`}>
             <SelectableColor color={state.meshBgColor}
               isSelected={isTargetMatch(activeTarget, { type: "meshBg" })}
               onSelect={() => setActiveTarget({ type: "meshBg" })}
